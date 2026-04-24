@@ -9,3 +9,4 @@ venv/
 reports/
 allure-results/
 allure-report/
+.env

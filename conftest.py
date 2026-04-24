@@ -1,17 +1,20 @@
 import pytest
+import config
 
 
 @pytest.fixture
 def base_url():
-    """
-    基础域名
-    """
-    return "https://httpbin.org"
+    return config.get_base_url()
 
 
 @pytest.fixture
 def timeout_seconds():
-    """
-    统一超时时间，避免每个测试重复写数字
-    """
-    return 10
+    return config.get_timeout_seconds()
+
+
+@pytest.fixture
+def test_context():
+    print("\n[SETUP] prepare test context")
+    ctx = {"trace_id": "demo-trace", "owner": "qa-learner"}
+    yield ctx
+    print("[TEARDOWN] cleanup test context")

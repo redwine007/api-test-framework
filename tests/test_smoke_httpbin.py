@@ -3,13 +3,14 @@ import pytest
 
 
 @pytest.mark.smoke
-def test_httpbin_get_returns_200(base_url, timeout_seconds):
+def test_httpbin_get_returns_200(base_url, timeout_seconds, test_context):
     """
     - 发起 GET 请求
     - 断言状态码为 200
 
     """
     url = f"{base_url}/get"
+    print(f"[DEBUG] base_url={base_url}, timeout={timeout_seconds}")
 
     # 发起请求（这里先直接用 requests，Day5 再改成复用 http_client）
     resp = http_client.http_get(url, timeout=timeout_seconds)
