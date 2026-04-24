@@ -1,7 +1,8 @@
 import http_client
-from conftest import base_url, timeout_seconds
+import pytest
 
 
+@pytest.mark.smoke
 def test_httpbin_get_returns_200(base_url, timeout_seconds):
     """
     - 发起 GET 请求
@@ -17,11 +18,17 @@ def test_httpbin_get_returns_200(base_url, timeout_seconds):
     assert resp.status_code == 200, f"unexpected status code: {resp.status_code}"
 
 
-def test_httpbin_status_404(base_url, timeout_seconds):
+@pytest.mark.regression
+@pytest.mark.parametrize("path, expected_status",[
+        ("/status/200", 200),
+        ("/status/404", 404),
+        ("/status/500", 500),
+])
+def test_httpbin_status_endpoints(base_url, timeout_seconds, path, expected_status):
     # 这个用例是“可预期的失败/错误码”
     # httpbin 的 /status/404 会稳定返回 404（对外部依赖的要求：稳定可复现）
-    url = f"{base_url}/status/404"
+    url = f"{base_url}{path}"
 
     res = http_client.http_get(url, timeout=timeout_seconds)
 
-    assert res.status_code == 404, f"expected 404, got: {res.status_code}"
+    assert res.status_code == expected_status, f"path={path}, 预期={expected_status}, 实际={res.status_code}"
