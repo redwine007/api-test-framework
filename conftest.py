@@ -18,3 +18,8 @@ def test_context():
     ctx = {"trace_id": "demo-trace", "owner": "qa-learner"}
     yield ctx
     print("[TEARDOWN] cleanup test context")
+
+
+@pytest.fixture
+def bearer_token():
+    return config.get_bearer_token()

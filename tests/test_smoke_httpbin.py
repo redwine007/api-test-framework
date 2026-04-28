@@ -33,3 +33,29 @@ def test_httpbin_status_endpoints(base_url, timeout_seconds, path, expected_stat
     res = http_client.http_get(url, timeout=timeout_seconds)
 
     assert res.status_code == expected_status, f"path={path}, 预期={expected_status}, 实际={res.status_code}"
+
+
+def test_httpbin_headers_echo_contains_request_headers(base_url, timeout_seconds):
+    """
+    验证： headers ，httpbin 能把请求头回显在 JSON 里。
+    """
+    url = f"{base_url}/headers"
+    resp = http_client.http_get(url, timeout=timeout_seconds, token="")
+
+    assert resp.status_code == 200
+    data = resp.json()
+    # httpbin 返回结构里包含 "headers"
+    assert "headers" in data
+
+    # 进一步断言
+    headers_echo = data["headers"]
+    assert "Host" in headers_echo
+
+
+@pytest.mark.regression
+def test_bearer_endpoint_when_token_configured(base_url, timeout_seconds, bearer_token):
+    if not bearer_token:
+        pytest.skip("TEST_TOKEN 未配置，跳过 bearer 用例")
+    url = f"{base_url}/bearer"
+    resp = http_client.http_get(url, timeout=timeout_seconds, token=bearer_token)
+    assert resp.status_code == 200

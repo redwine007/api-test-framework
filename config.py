@@ -26,7 +26,12 @@ def get_timeout_seconds() -> int:
     获取超时时间：
     - 优先读取环境变量 TEST_TIMEOUT（字符串）
     - 未设置时用默认值
-    - 最终转成 int，供 requests 使用
+    - 返回 int，供 requests 使用
     """
     value = os.getenv("TEST_TIMEOUT", str(DEFAULT_TIMEOUT_SECONDS))
     return int(value)
+
+
+# 新增：读取可选 token（没配置就返回空字符串）
+def get_bearer_token() -> str:
+    return os.getenv("TEST_TOKEN", "")
