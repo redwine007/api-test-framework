@@ -20,11 +20,14 @@ def test_httpbin_get_returns_200(base_url, timeout_seconds, test_context):
 
 
 @pytest.mark.regression
-@pytest.mark.parametrize("path, expected_status",[
+@pytest.mark.parametrize(
+    "path, expected_status",
+    [
         ("/status/200", 200),
         ("/status/404", 404),
         ("/status/500", 500),
-])
+    ],
+)
 def test_httpbin_status_endpoints(base_url, timeout_seconds, path, expected_status):
     # 这个用例是“可预期的失败/错误码”
     # httpbin 的 /status/404 会稳定返回 404（对外部依赖的要求：稳定可复现）
@@ -32,7 +35,9 @@ def test_httpbin_status_endpoints(base_url, timeout_seconds, path, expected_stat
 
     res = http_client.http_get(url, timeout=timeout_seconds)
 
-    assert res.status_code == expected_status, f"path={path}, 预期={expected_status}, 实际={res.status_code}"
+    assert (
+        res.status_code == expected_status
+    ), f"path={path}, 预期={expected_status}, 实际={res.status_code}"
 
 
 def test_httpbin_headers_echo_contains_request_headers(base_url, timeout_seconds):

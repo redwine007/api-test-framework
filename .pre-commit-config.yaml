@@ -1,0 +1,17 @@
+repos:
+  # 官方通用 hooks：处理空格、文件结尾、yaml 基础检查等
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace      # 删除行尾多余空格
+      - id: end-of-file-fixer        # 确保文件以一个换行结尾
+      - id: check-yaml               # 检查 yaml 基本语法
+      - id: check-merge-conflict     # 检查是否残留 <<<<<<< 这类冲突标记
+
+  # Ruff：Python lint 检查
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]                # 自动修复一部分问题
+      - id: ruff-format              # 代码格式化（类似 black）

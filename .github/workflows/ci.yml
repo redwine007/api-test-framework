@@ -30,7 +30,12 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      # 第四步：运行测试
+      # commit前检查语法
+      - name: Run pre-commit checks
+        run: |
+          python -m pre_commit run --all-files
+
+      # 运行测试
       - name: Run tests
         run: |
           python -m pytest -q

@@ -24,8 +24,8 @@ def assert_status_ok(response) -> bool:
 
 if __name__ == "__main__":
     # 1) 从配置读取参数
-    url = config.TARGET_URL
-    timeout = config.TIMEOUT_SECONDS
+    url = config.get_base_url()
+    timeout = config.get_timeout_seconds()
 
     # 2) 发起请求
     try:

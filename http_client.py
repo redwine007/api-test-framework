@@ -51,13 +51,13 @@ def create_session(token: str) -> requests.Session:
 
 
 def http_get(
-        url: str,
-        timeout: int,
-        token: str = "",
-        retries: int = 2,
-        retry_interval: float = 0.5,
-        session: Optional[requests.Session] = None,
-    ) -> requests.Response:
+    url: str,
+    timeout: int,
+    token: str = "",
+    retries: int = 2,
+    retry_interval: float = 0.5,
+    session: Optional[requests.Session] = None,
+) -> requests.Response:
     """
     发送 GET 请求并返回 Response 对象。
 
