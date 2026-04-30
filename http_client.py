@@ -5,25 +5,49 @@ import time
 import requests
 
 import uuid
+from typing import Optional
 
 
-def _default_headers() -> dict:
+def _new_request_id() -> str:
     """
-    统一公共请求头
+    生成一次请求的唯一 ID
+    """
+    return str(uuid.uuid4())
+
+
+def build_default_headers() -> dict[str, str]:
+    """
+    默认 headers：
+    - X-Request-Id：一次 HTTP 调用一个 ID、
     """
     return {
-        "X-Request-Id": str(uuid.uuid4()),  # 一次请求一个唯一 ID
-        "Content-Type": "application/json",
+        "X-Request-Id": _new_request_id(),
+        "Accept": "application/json",
     }
 
 
-def _auth_header(token: str) -> dict:
+def build_auth_headers(token: str) -> dict[str, str]:
     """
-    有 token 才加认证头，避免没配置时硬塞无效值
+    Bearer 鉴权：
+    - token 为空：不加 Authorization（避免无效头干扰）
     """
+    token = token.strip()
     if not token:
         return {}
+
     return {"Authorization": f"Bearer {token}"}
+
+
+def create_session(token: str) -> requests.Session:
+    """
+    - requests.Session 复用底层 TCP 连接（连接池）
+    - 把默认 headers 设置在 session 上，后续每次请求自动带
+    """
+    session = requests.Session()
+
+    merged = {**build_default_headers(), **build_auth_headers(token)}
+    session.headers.update(merged)
+    return session
 
 
 def http_get(
@@ -31,7 +55,8 @@ def http_get(
         timeout: int,
         token: str = "",
         retries: int = 2,
-        retry_interval: float = 0.5
+        retry_interval: float = 0.5,
+        session: Optional[requests.Session] = None,
     ) -> requests.Response:
     """
     发送 GET 请求并返回 Response 对象。
@@ -44,15 +69,24 @@ def http_get(
     返回：
     - requests.Response：包含 status_code、headers、text/json 等
     """
-
-    headers = {**_default_headers(), **_auth_header(token)}
-    err_info = None
-    for attempt in range(retries + 1):
-        try:
-            return requests.get(url, timeout=timeout, headers=headers)
-        except requests.RequestException as e:
-            err_info = e
-            if attempt < retries:
-                time.sleep(retry_interval)
-            else:
-                raise err_info
+    owns_session = False
+    if session is None:
+        session = create_session(token)
+        owns_session = True
+    last_error: Optional[Exception] = None
+    try:
+        for attempt in range(retries + 1):
+            try:
+                per_request_headers = {"X-Request-Id": _new_request_id()}
+                return session.get(url, timeout=timeout, headers=per_request_headers)
+            except requests.RequestException as e:
+                last_error = e
+                if attempt < retries:
+                    time.sleep(retry_interval)
+                else:
+                    raise last_error
+    finally:
+        # Session 需要关闭（释放连接池资源）
+        # owns_session=True 表示这个 session 是本函数创建的，应由本函数关闭
+        if owns_session:
+            session.close()
