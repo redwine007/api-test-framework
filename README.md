@@ -15,7 +15,7 @@
 
 ## 2. 技术栈
 
-- ` Python` 3.10+（建议与 CI 对齐）
+- `Python` 3.10+（建议与 CI 对齐）
 - `pytest`：测试运行与断言
 - `requests`：HTTP 调用
 - `python-dotenv`：加载 `.env` 到进程环境变量
@@ -23,7 +23,7 @@
 - `pytest-html`：HTML 报告（可选）
 - `allure-pytest` + Allure CLI：Allure 报告（可选）
 - `pre-commit` + `ruff`：本地与 CI 代码质量门
-- GitHub Actions：CI
+- `GitHub Actions`：CI
 ---
 
 ## 3. 目录结构
